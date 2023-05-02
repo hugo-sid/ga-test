@@ -1,0 +1,62 @@
+name: Build
+
+on: 
+  workflow_dispatch:
+
+env:
+    FLUTTER_VERSION: 3.7.12
+
+jobs:
+  
+  buildTestRelease:
+    strategy:
+      matrix:
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
+        include:
+          - os: windows-latest
+            platform: "windows"
+          - os: ubuntu-latest
+            platform: "linux"
+          - os: macos-latest
+            platform: "macos"
+      fail-fast: false
+
+    runs-on: ${{ matrix.os }}
+    
+#     env:
+#       PROJECT_NAME: 'X'
+#       ARCH: 'x64'
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: "stable"
+        flutter-version: ${{ env.FLUTTER_VERSION }}
+        cache: true
+        cache-key: "flutter-:os:-:channel:-:version:-:arch:-:hash:" # optional, change this to force refresh cache
+        cache-path: "${{ runner.tool_cache }}/flutter/:channel:-:version:-:arch:" # optional, change this to specify the cache path
+        architecture: x64 # optional, x64 or arm64
+
+    - name: Additional Tooling on Linux
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update -y
+        sudo apt-get install -y clang cmake ninja-build pkg-config libgtk-3-dev
+        sudo apt-get install fuse libfuse2
+        sudo modprobe -v fuse
+        sudo addgroup fuse
+        sudo adduser $USER fuse
+    - name: Additional Tooling on Windows
+      if: matrix.os == 'windows-latest'
+      run: |
+        Write-Host "Windows Tooling"
+    - name: Additional Tooling on MacOS"
+      if: matrix.os == 'macos-latest'
+      run: echo "Addition
+    - name: Build and Publish
+      run: |
+        flutter doctor
+        flutter build ${{ matrix.platform }}
