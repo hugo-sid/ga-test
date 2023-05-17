@@ -36,8 +36,8 @@
         - name: Print vars
           run: |
             # run the Inno Setup compiler
-            echo "version_str=${{ steps.get-version.outputs.version_str }}"
-            echo "version_str=${{ steps.get-version.outputs.version_int }}"
+            echo "version_str=${{ env.version_str }}"
+            echo "version_str=$${{ env.version_int }}"
             
     job3_create_release:
       name: Test on Linux
