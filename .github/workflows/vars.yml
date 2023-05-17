@@ -1,0 +1,52 @@
+  name: Test vars
+
+  on:
+    push:
+      tags:
+        - 'v*.*.*'
+  jobs:
+    job_windows_build:
+      name: Windows vars test
+      runs-on: windows-2022
+      timeout-minutes: 30
+      outputs:
+        version_str: ${{ steps.get-version.outputs.version_str }}
+        version_int: ${{ steps.get-version.outputs.version_int }}
+      defaults:
+        run:
+          shell: powershell
+          working-directory: ${{ github.workspace }}
+      steps:
+        - name: Extract git tag
+          id: get-version
+          run: |
+            # set environment variables to control execution of other steps
+            echo "create_release=1" | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            # fetch the latest Git tag, this is used to set version number in all installers
+            $version_str = git tag --sort=v:refname | Select-Object -Last 1 # Sample output: v1.2.3
+            $version_int = $version_str.Remove(0,1) # Sample output: 1.2.3
+            # print these variables to the console
+            Write-Host "version_str=$version_str"
+            Write-Host "version_int=$version_int"
+            # set the output variable for use in other steps
+            echo "name=version_int::$version_int " | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+            echo "name=version_str::$version_str " | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
+        - name: Print vars
+          run: |
+            # run the Inno Setup compiler
+            echo "version_str=${{ steps.get-version.outputs.version_str }}"
+            echo "version_str=${{ steps.get-version.outputs.version_int }}"
+            
+    job3_create_release:
+      name: Create draft release
+      if: startsWith(github.ref, 'refs/tags/')
+      needs: [job_windows_build]
+      runs-on: ubuntu-22.04
+      timeout-minutes: 60
+      steps:
+        - name: Print vars
+          run: |
+            # run the Inno Setup compiler
+            echo "version_str=${{ needs.job_windows_build.outputs.version_str }}"
+            echo "version_int=${{ needs.job_windows_build.outputs.version_int }}"
+      
