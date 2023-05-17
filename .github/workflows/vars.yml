@@ -28,13 +28,13 @@
             Write-Host "version_str=$version_str"
             Write-Host "version_int=$version_int"
             # set the output variable for use in other steps
-            Add-Content -Path $env:GITHUB_ENV -Value "version_int=$version_int"
-            Add-Content -Path $env:GITHUB_ENV -Value "version_str=$version_str"
+            Add-Content -Path $env:GITHUB_OUTPUT -Value "version_int=$version_int"
+            Add-Content -Path $env:GITHUB_OUTPUT -Value "version_str=$version_str"
         - name: Print vars
           run: |
             # run the Inno Setup compiler
-            echo "version_str=${{ env.version_str }}"
-            echo "version_str=${{ env.version_int }}"
+            echo "version_str=${{ steps.get-version.outputs.version_str }}"
+            echo "version_str=${{ steps.get-version.outputs.version_int }}"
       outputs:
         version_str: ${{ steps.get-version.outputs.version_str }}
         version_int: ${{ steps.get-version.outputs.version_int }}
