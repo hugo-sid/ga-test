@@ -9,9 +9,6 @@
       name: Windows vars test
       runs-on: windows-2022
       timeout-minutes: 30
-      outputs:
-        version_str: ${{ steps.get-version.outputs.version_str }}
-        version_int: ${{ steps.get-version.outputs.version_int }}
       defaults:
         run:
           shell: powershell
@@ -37,7 +34,10 @@
           run: |
             # run the Inno Setup compiler
             echo "version_str=${{ env.version_str }}"
-            echo "version_str=$${{ env.version_int }}"
+            echo "version_str=${{ env.version_int }}"
+      outputs:
+        version_str: ${{ steps.get-version.outputs.version_str }}
+        version_int: ${{ steps.get-version.outputs.version_int }}
             
     job3_create_release:
       name: Test on Linux
