@@ -13,6 +13,9 @@
         run:
           shell: powershell
           working-directory: ${{ github.workspace }}
+      outputs:
+        version_str: ${{ steps.get-version.outputs.version_str }}
+        version_int: ${{ steps.get-version.outputs.version_int }}
       steps:
         - name: Checkout
           uses: actions/checkout@v3
@@ -35,9 +38,7 @@
             # run the Inno Setup compiler
             echo "version_str=${{ steps.get-version.outputs.version_str }}"
             echo "version_str=${{ steps.get-version.outputs.version_int }}"
-      outputs:
-        version_str: ${{ steps.get-version.outputs.version_str }}
-        version_int: ${{ steps.get-version.outputs.version_int }}
+
             
     job3_create_release:
       name: Test on Linux
