@@ -31,8 +31,8 @@
             Write-Host "version_str=$version_str"
             Write-Host "version_int=$version_int"
             # set the output variable for use in other steps
-            echo "name=version_int::$version_int " | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
-            echo "name=version_str::$version_str " | Out-File -FilePath $env:GITHUB_ENV -Encoding utf8 -Append
+            Add-Content -Path $env:GITHUB_ENV -Value "version_int=$version_int"
+            Add-Content -Path $env:GITHUB_ENV -Value "version_str=$version_str"
         - name: Print vars
           run: |
             # run the Inno Setup compiler
@@ -50,4 +50,3 @@
             # run the Inno Setup compiler
             echo "version_str=${{ needs.job_windows_build.outputs.version_str }}"
             echo "version_int=${{ needs.job_windows_build.outputs.version_int }}"
-      
